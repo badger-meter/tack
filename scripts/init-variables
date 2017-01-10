@@ -1,13 +1,13 @@
 #!/bin/bash -e
 
 function usage {
-  echo "USAGE: $0 <aws-region> <core-os-channel> <coreos-vm-type> <aws-key-name> <internal-tld> <cluster-name> <cidr-allow-ssh> <vpc-cidr> <pod-ip-range> <k8s-service-ip-range> <k8s-service-ip> <k8s-dns-ip> <k8s-etcd-ips> <hyperkube-image> <hyperkube-tag>"
-  echo "  example: $0 us-west-1 stable hvm k8s-testing testing.k8s testing 0.0.0.0/0 10.0.0.0/16 10.2.0.0/16 10.3.0.0/24 10.3.0.1 10.3.0.10 10.0.10.10,10.0.10.11,10.0.10.12 quay.io/coreos/hyperkube v1.4.6_coreos.0"
+  echo "USAGE: $0 <aws-region> <core-os-channel> <coreos-vm-type> <aws-key-name> <internal-tld> <cluster-name> <cidr-allow-ssh> <vpc-cidr> <pod-ip-range> <k8s-service-ip-range> <k8s-service-ip> <k8s-dns-ip> <k8s-etcd-ips> <hyperkube-image> <hyperkube-tag> <env-tag> <purpose-tag> <metrics-tag>"
+  echo "  example: $0 us-west-1 stable hvm k8s-testing testing.k8s testing 0.0.0.0/0 10.0.0.0/16 10.2.0.0/16 10.3.0.0/24 10.3.0.1 10.3.0.10 10.0.10.10,10.0.10.11,10.0.10.12 quay.io/coreos/hyperkube v1.4.6_coreos.0 stage Stage datadog"
 
   exit 1
 }
 
-if [[ $# -ne 15 ]]; then
+if [[ $# -ne 18 ]]; then
   usage
 fi
 
@@ -26,6 +26,9 @@ K8S_DNS_IP="${12}"
 ETCD_IPS="${13}"
 HYPERKUBE_IMAGE="${14}"
 HYPERKUBE_TAG="${15}"
+ENV_TAG="${16}"
+PURPOSE_TAG="${17}"
+METRICS_TAG="${18}"
 
 COREOS_AMI_ID=`curl -s \
   $(printf "http://%s.release.core-os.net/amd64-usr/current/coreos_production_ami_%s_%s.txt" \
@@ -35,10 +38,11 @@ AWS_ACCOUNT_ID=`aws iam get-user --output json \
 	| awk '/arn:aws:/{print $2}' \
 	| grep -Eo '[[:digit:]]{12}'`
 
-AWS_REGION_AZS=`aws ec2 describe-availability-zones --region ${AWS_REGION} --output json \
-  | jq --raw-output '.AvailabilityZones | map(.ZoneName) | .[]' \
-  | xargs \
-  | sed -e 's/ /,/g'`
+#AWS_REGION_AZS=`aws ec2 describe-availability-zones --region ${AWS_REGION} --output json \
+#  | jq --raw-output '.AvailabilityZones | map(.ZoneName) | .[]' \
+#  | xargs \
+#  | sed -e 's/ /,/g'`
+  AWS_REGION_AZS='us-east-1a,us-east-1c'
 
 
 cat <<EOF > terraform.tfvars
@@ -64,11 +68,16 @@ k8s = {
     hyperkube-image = "${HYPERKUBE_IMAGE}"
     hyperkube-tag = "${HYPERKUBE_TAG}"
 }
+tags = {
+    env = "${ENV_TAG}"
+    purpose = "${PURPOSE_TAG}"
+    metrics = "${METRICS_TAG}"
+}
 dns-service-ip = "${K8S_DNS_IP}"
 internal-tld = "${INTERNAL_TLD}"
 k8s-service-ip = "${K8S_SERVICE_IP}"
 name = "${CLUSTER_NAME}"
-s3-bucket = "${AWS_ACCOUNT_ID}-${CLUSTER_NAME}-${AWS_REGION}"
+s3-bucket = "${AWS_ACCOUNT_ID}-k8s-${CLUSTER_NAME}-${AWS_REGION}"
 etcd-ips = "$ETCD_IPS"
 EOF
 if [ -f ./vpc-existing.tfvars ]; then cat ./vpc-existing.tfvars >>terraform.tfvars ; fi

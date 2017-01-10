@@ -12,10 +12,15 @@ AWS_REGION ?= us-east-1
 COREOS_CHANNEL ?= stable
 COREOS_VM_TYPE ?= hvm
 
-CLUSTER_NAME ?= test
-AWS_EC2_KEY_NAME ?= kz8s-$(CLUSTER_NAME)
+CLUSTER_NAME ?= stage2
+AWS_EC2_KEY_NAME ?= k8s-$(CLUSTER_NAME)-kp
 
-INTERNAL_TLD := ${CLUSTER_NAME}.kz8s
+INTERNAL_TLD := ${CLUSTER_NAME}.k8s
+
+# BMI ADD
+ENV_TAG ?= stage
+PURPOSE_TAG ?= Stage
+METRICS_TAG ?= datadog
 
 # CIDR_PODS: flannel overlay range
 # - https://coreos.com/flannel/docs/latest/flannel-config.html
@@ -32,8 +37,8 @@ CIDR_SERVICE_CLUSTER ?= 10.3.0.0/24
 K8S_SERVICE_IP ?= 10.3.0.1
 K8S_DNS_IP ?= 10.3.0.10
 
-CIDR_VPC ?= 10.0.0.0/16
-ETCD_IPS ?= 10.0.10.10,10.0.10.11,10.0.10.12
+CIDR_VPC ?= 10.1.0.0/16
+ETCD_IPS ?= 10.1.0.55,10.1.0.56,10.1.0.57
 
 HYPERKUBE_IMAGE ?= quay.io/coreos/hyperkube
 HYPERKUBE_TAG ?= v1.5.1_coreos.0

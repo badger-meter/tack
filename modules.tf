@@ -9,6 +9,7 @@ module "s3" {
   name = "${ var.name }"
   region = "${ var.aws["region"] }"
   service-cluster-ip-range = "${ var.cidr["service-cluster"] }"
+  tags = "${ var.tags }"
 }
 
 module "vpc" {
@@ -29,6 +30,7 @@ module "security" {
   cidr-vpc = "${ var.cidr["vpc"] }"
   name = "${ var.name }"
   vpc-id = "${ module.vpc.id }"
+  tags = "${ var.tags }"
 }
 
 module "iam" {
@@ -37,6 +39,7 @@ module "iam" {
 
   bucket-prefix = "${ var.s3-bucket }"
   name = "${ var.name }"
+  env = "${ var.tags["env"] }"
 }
 
 module "route53" {
@@ -73,23 +76,24 @@ module "etcd" {
   subnet-ids-private = "${ module.vpc.subnet-ids-private }"
   subnet-ids-public = "${ module.vpc.subnet-ids-public }"
   vpc-id = "${ module.vpc.id }"
+  tags = "${ var.tags }"
 }
 
-module "bastion" {
-  source = "./modules/bastion"
-  depends-id = "${ module.etcd.depends-id }"
-
-  ami-id = "${ var.coreos-aws["ami"] }"
-  bucket-prefix = "${ var.s3-bucket }"
-  cidr-allow-ssh = "${ var.cidr["allow-ssh"] }"
-  instance-type = "${ var.instance-type["bastion"] }"
-  internal-tld = "${ var.internal-tld }"
-  key-name = "${ var.aws["key-name"] }"
-  name = "${ var.name }"
-  security-group-id = "${ module.security.bastion-id }"
-  subnet-ids = "${ module.vpc.subnet-ids-public }"
-  vpc-id = "${ module.vpc.id }"
-}
+#module "bastion" {
+#  source = "./modules/bastion"
+#  depends-id = "${ module.etcd.depends-id }"
+#
+#  ami-id = "${ var.coreos-aws["ami"] }"
+#  bucket-prefix = "${ var.s3-bucket }"
+#  cidr-allow-ssh = "${ var.cidr["allow-ssh"] }"
+#  instance-type = "${ var.instance-type["bastion"] }"
+#  internal-tld = "${ var.internal-tld }"
+#  key-name = "${ var.aws["key-name"] }"
+#  name = "${ var.name }"
+#  security-group-id = "${ module.security.bastion-id }"
+#  subnet-ids = "${ module.vpc.subnet-ids-public }"
+#  vpc-id = "${ module.vpc.id }"
+#}
 
 module "worker" {
   source = "./modules/worker"
@@ -98,9 +102,9 @@ module "worker" {
   ami-id = "${ var.coreos-aws["ami"] }"
   bucket-prefix = "${ var.s3-bucket }"
   capacity = {
-    desired = 3
+    desired = 2
     max = 5
-    min = 3
+    min = 2
   }
   cluster-domain = "${ var.cluster-domain }"
   hyperkube-image = "${ var.k8s["hyperkube-image"] }"
@@ -120,6 +124,7 @@ module "worker" {
   }
   vpc-id = "${ module.vpc.id }"
   worker-name = "general"
+  tags = "${ var.tags }"
 }
 
 /*

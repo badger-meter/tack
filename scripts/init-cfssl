@@ -26,9 +26,9 @@ set -o pipefail
 function ca-csr {
   cat <<EOF
 {
-  "CN": "CA",
+  "CN": "CA-$1",
   "key": { "algo": "rsa", "size": 2048 },
-  "names": [{ "C": "US", "L": "San Francisco", "O": "Kubernetes", "ST": "California" }]
+  "names": [{ "C": "US", "L": "Los Gatos", "O": "SVIC", "ST": "California" }]
 }
 EOF
 }
@@ -91,7 +91,7 @@ function generate {
 }
 
 mkdir -p $OUTDIR && cd $OUTDIR
-echo "$(ca-csr)" >ca-csr.json
+echo "$(ca-csr $INTERNAL_TLD)" >ca-csr.json
 echo "$(ca-config)" >ca-config.json
 
 # generate ca

@@ -6,8 +6,10 @@ resource "aws_s3_bucket" "ssl" {
   tags {
     builtWith = "terraform"
     KubernetesCluster = "${ var.name }"
-    Name = "kz8s-${ var.name }"
+    Name = "k8s-${ var.name }"
     version = "${ var.hyperkube-tag }"
+    env = "${ var.tags["env"] }"
+    Purpose = "${ var.tags["purpose"] }"
   }
 
   provisioner "local-exec" {

@@ -31,7 +31,7 @@ variable "instance-type" {
   default = {
     bastion = "t2.nano"
     etcd = "m3.medium"
-    worker = "m3.medium"
+    worker = "m4.large"
   }
 }
 variable "internal-tld" {}
@@ -52,10 +52,17 @@ variable "vpc-existing" {
     subnet-ids-private = ""
   }
 }
+variable "tags" {
+  default = {
+    env = ""
+    purpose = ""
+    metrics = ""
+  }
+}
 
 # outputs
 output "azs" { value = "${ var.aws["azs"] }" }
-output "bastion-ip" { value = "${ module.bastion.ip }" }
+#output "bastion-ip" { value = "${ module.bastion.ip }" }
 output "cluster-domain" { value = "${ var.cluster-domain }" }
 output "dns-service-ip" { value = "${ var.dns-service-ip }" }
 output "etcd1-ip" { value = "${ element( split(",", var.etcd-ips), 0 ) }" }
@@ -67,3 +74,4 @@ output "s3-bucket" { value = "${ var.s3-bucket }" }
 output "subnet-ids-private" { value = "${ module.vpc.subnet-ids-private }" }
 output "subnet-ids-public" { value = "${ module.vpc.subnet-ids-public }" }
 output "worker-autoscaling-group-name" { value = "${ module.worker.autoscaling-group-name }" }
+output "kubeconfig" { value = "${ module.kubeconfig.kubeconfig }" }

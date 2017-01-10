@@ -28,7 +28,7 @@ resource "aws_launch_configuration" "worker" {
 }
 
 resource "aws_autoscaling_group" "worker" {
-  name = "worker-${ var.worker-name }-${ var.name }"
+  name = "k8s-${ var.name }-worker-${ var.worker-name }"
 
   desired_capacity = "${ var.capacity["desired"] }"
   health_check_grace_period = 60
@@ -58,15 +58,15 @@ resource "aws_autoscaling_group" "worker" {
     propagate_at_launch = true
   }
 
-  tag {
-    key = "kz8s"
-    value = "${ var.name }"
-    propagate_at_launch = true
-  }
+#  tag {
+#    key = "kz8s"
+#    value = "${ var.name }"
+#    propagate_at_launch = true
+#  }
 
   tag {
     key = "Name"
-    value = "kz8s-worker"
+    value = "${ var.tags["env"] } - k8s-${ var.name }-worker"
     propagate_at_launch = true
   }
 
@@ -85,6 +85,24 @@ resource "aws_autoscaling_group" "worker" {
   tag {
     key = "visibility"
     value = "private"
+    propagate_at_launch = true
+  }
+
+  tag {
+    key = "env"
+    value = "${ var.tags["env"] }"
+    propagate_at_launch = true
+  }
+
+  tag {
+    key = "Purpose"
+    value = "${ var.tags["purpose"] }"
+    propagate_at_launch = true
+  }
+
+  tag {
+    key = "metrics"
+    value = "${ var.tags["metrics"] }"
     propagate_at_launch = true
   }
 }
