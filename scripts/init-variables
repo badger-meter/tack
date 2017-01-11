@@ -42,7 +42,9 @@ AWS_ACCOUNT_ID=`aws iam get-user --output json \
 #  | jq --raw-output '.AvailabilityZones | map(.ZoneName) | .[]' \
 #  | xargs \
 #  | sed -e 's/ /,/g'`
-  AWS_REGION_AZS='us-east-1a,us-east-1c'
+#### THIS MUST BE ONE AZ. We use persistent volumes and so all nodes MUST
+#### be in the same az if the pv has to be moved from one node to another
+  AWS_REGION_AZS='us-east-1a'
 
 
 cat <<EOF > terraform.tfvars

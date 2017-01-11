@@ -10,6 +10,6 @@ etcd-ips = "10.1.0.55,10.1.0.56,10.1.0.57"
 vpc-existing {
 	id = "vpc-a7bc4dc3"
 	gateway-id = "igw-cdf4d3a8"
-	subnet-ids-public = "subnet-7c7f2225,subnet-e938d2d4"
-	subnet-ids-private = "subnet-587f2201,subnet-9838d2a5"
+	subnet-ids-public = "subnet-7c7f2225"
+	subnet-ids-private = "subnet-587f2201"
 }
