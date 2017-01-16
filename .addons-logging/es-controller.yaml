@@ -18,6 +18,11 @@ spec:
         k8s-app: elasticsearch-logging
         version: v1
         kubernetes.io/cluster-service: "true"
+      annotations:
+        # Note these WILL change format when the DD collector is updated (this is for 5.10.1)
+        com.datadoghq.sd/check_names: '["elastic"]'
+        com.datadoghq.sd/init_configs: '[{}]'
+        com.datadoghq.sd/instances: '[{"url": "http://%%host%%:9200"}]'
     spec:
       containers:
       - image: gcr.io/google_containers/elasticsearch:v2.4.1
