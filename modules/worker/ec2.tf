@@ -22,9 +22,9 @@ resource "aws_launch_configuration" "worker" {
 
   user_data = "${ data.template_file.cloud-config.rendered }"
 
-  /*lifecycle {
+  lifecycle {
     create_before_destroy = true
-  }*/
+  }
 }
 
 resource "aws_autoscaling_group" "worker" {
