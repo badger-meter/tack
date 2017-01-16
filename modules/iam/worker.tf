@@ -1,5 +1,5 @@
 resource "aws_iam_role" "worker" {
-  name = "worker-k8s-${ var.name }"
+  name = "${ var.env }-k8s-${ var.name }-worker-role"
 
   assume_role_policy = <<EOS
 {
@@ -18,14 +18,20 @@ EOS
 }
 
 resource "aws_iam_instance_profile" "worker" {
-  name = "worker-k8s-${ var.name }"
+  name = "${ var.env }-k8s-${ var.name }-worker-role"
 
   roles = [ "${ aws_iam_role.worker.name }" ]
 }
 
 resource "aws_iam_role_policy" "worker" {
-  name = "worker-k8s-${var.name}"
+  name = "${ var.env }-k8s-${ var.name }-worker-role"
   role = "${ aws_iam_role.worker.id }"
+  # Removed from policy
+  #        "ec2:CreateRoute",
+  #        "ec2:DeleteRoute",
+  #        "ec2:ReplaceRoute",
+  #        "ec2:DescribeRouteTables",
+  #        "ec2:DescribeInstances"
   policy = <<EOS
 {
   "Version": "2012-10-17",
@@ -43,12 +49,7 @@ resource "aws_iam_role_policy" "worker" {
       "Action": [
         "ec2:Describe*",
         "ec2:AttachVolume",
-        "ec2:DetachVolume",
-        "ec2:CreateRoute",
-        "ec2:DeleteRoute",
-        "ec2:ReplaceRoute",
-        "ec2:DescribeRouteTables",
-        "ec2:DescribeInstances"
+        "ec2:DetachVolume"
       ],
       "Resource": "*"
     },

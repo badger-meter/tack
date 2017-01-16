@@ -1,6 +1,7 @@
 variable "bucket-prefix" {}
 variable "depends-id" {}
 variable "name" {}
+variable "env" {}
 
 output "depends-id" { value = "${ null_resource.dummy_dependency.id }" }
 output "aws-iam-role-etcd-id" { value = "${ aws_iam_role.master.id }" }
