@@ -1,5 +1,5 @@
 resource "aws_elb" "external" {
-  name = "kz8s-apiserver-${replace(var.name, "/(.{0,17})(.*)/", "$1")}"
+  name = "${ var.tags["env"] }-k8s-${replace(var.name, "/(.{0,17})(.*)/", "$1")}-apiserver"
 
   cross_zone_load_balancing = false
 
@@ -26,11 +26,13 @@ resource "aws_elb" "external" {
 
   tags {
     builtWith = "terraform"
-    kz8s = "${ var.name }"
-    Name = "kz8s-apiserver"
+    # kz8s = "${ var.name }"
+    Name = "${ var.tags["env"] }-k8s-${ var.name }-apiserver"
     role = "apiserver"
     version = "${ var.k8s["hyperkube-tag"] }"
     visibility = "public"
     KubernetesCluster = "${ var.name }"
+    env = "${ var.tags["env"] }"
+    Purpose = "${ var.tags["purpose"] }"
   }
 }

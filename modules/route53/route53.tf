@@ -1,11 +1,11 @@
 resource "aws_route53_zone" "internal" {
-  comment = "Kubernetes [tack] cluster DNS (internal)"
+  comment = "Kubernetes cluster DNS (internal)"
   name = "${ var.internal-tld }"
   tags {
     builtWith = "terraform"
     KubernetesCluster = "${ var.name }"
-    kz8s = "${ var.name }"
-    Name = "k8s-${ var.name }"
+    # kz8s = "${ var.name }"
+    Name = "${ var.env } - k8s-${ var.name }"
   }
   vpc_id = "${ var.vpc-id }"
 }

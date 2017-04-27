@@ -12,10 +12,13 @@ resource "aws_instance" "pki" {
 
   tags  {
     builtWith = "terraform"
-    kz8s = "${ var.name }"
+    # kz8s = "${ var.name }"
     depends-id = "${ var.depends-id }"
-    Name = "kz8s-pki"
+    Name = "${ var.tags["env"] } - k8s-${ var.name }-pki"
     role = "pki"
+    env = "${ var.tags["env"] }"
+    Purpose = "${ var.tags["purpose"] }"
+    metrics = "${ var.tags["metrics"] }"
   }
 
   user_data = "${ data.template_file.user-data.rendered }"

@@ -1,5 +1,5 @@
 resource "aws_iam_role" "master" {
-  name = "master-k8s-${ var.name }"
+  name = "${ var.env }-k8s-${ var.name }-controller-role"
 
   assume_role_policy = <<EOS
 {
@@ -16,13 +16,13 @@ EOS
 }
 
 resource "aws_iam_instance_profile" "master" {
-  name = "master-k8s-${ var.name }"
+  name = "${ var.env }-k8s-${ var.name }-controller-role"
 
   role = "${ aws_iam_role.master.name }"
 }
 
 resource "aws_iam_role_policy" "master" {
-  name = "master-k8s-${ var.name }"
+  name = "${ var.env }-k8s-${ var.name }-controller-role"
 
   policy = <<EOS
 {
