@@ -82,7 +82,7 @@ write-files:
       {
         "CN": "CA",
         "key": { "algo": "rsa", "size": 2048 },
-        "names": [{ "C": "US", "L": "San Francisco", "O": "Kubernetes", "ST": "California" }]
+        "names": [{ "C": "US", "L": "Los Gatos", "O": "SVIC", "ST": "California" }]
       }
 
   - path: /etc/cfssl/ca-config.json

@@ -17,13 +17,15 @@ resource "aws_security_group" "pki" {
     cidr_blocks = [ "${ var.cidr-vpc }" ]
   }
 
-  name = "kz8s-pki-${ var.name }"
+  name = "${ var.tags["env"] }-k8s-${ var.name }-pki"
 
   tags {
     KubernetesCluster = "${ var.name }"
-    kz8s = "${ var.name }"
-    Name = "kz8s-pki-${ var.name }"
+    # kz8s = "${ var.name }"
+    Name = "${ var.tags["env"] }-k8s-${ var.name }-pki"
     builtWith = "terraform"
+    env = "${ var.tags["env"] }"
+    Purpose = "${ var.tags["purpose"] }"
   }
 
   vpc_id = "${ var.vpc-id }"

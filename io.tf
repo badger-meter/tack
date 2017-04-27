@@ -32,7 +32,7 @@ variable "instance-type" {
     bastion = "t2.nano"
     pki = "t2.nano"
     etcd = "m3.large"
-    worker = "m3.large"
+    worker = "m4.large"
   }
 }
 variable "internal-tld" {}
@@ -54,9 +54,17 @@ variable "vpc-existing" {
   }
 }
 
+variable "tags" {
+  default = {
+    env = ""
+    purpose = ""
+    metrics = ""
+  }
+}
+
 # outputs
 output "azs" { value = "${ var.aws["azs"] }" }
-output "bastion-ip" { value = "${ module.bastion.ip }" }
+output "bastion-ip" { value = "52.1.68.30" }
 output "cluster-domain" { value = "${ var.cluster-domain }" }
 output "dns-service-ip" { value = "${ var.dns-service-ip }" }
 output "etcd1-ip" { value = "${ element( split(",", var.etcd-ips), 0 ) }" }
@@ -73,7 +81,7 @@ output "worker-autoscaling-group-name" { value = "${ module.worker.autoscaling-g
 output "ips" {
   value = "${
     map(
-      "bastion", "${ module.bastion.ip }",
+      "bastion", "52.1.68.30",
       "dns-service", "${ var.dns-service-ip }",
       "etcd", "${ var.etcd-ips }",
       "pki", "${ module.pki.ip }",

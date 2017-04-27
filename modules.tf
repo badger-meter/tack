@@ -3,8 +3,9 @@ module "s3" {
 
   # variables
   aws = "${ var.aws }"
-  bucket = "kz8s-pki-${ var.name }-${ var.aws["account-id"] }-${ var.aws["region"] }"
+  bucket = "${ var.aws["account-id"] }-k8s-${ var.name }-${ var.aws["region"] }"
   name = "${ var.name }"
+  tags = "${ var.tags }"
 }
 
 module "vpc" {
@@ -28,6 +29,7 @@ module "route53" {
   etcd-ips = "${ var.etcd-ips }"
   internal-tld = "${ var.internal-tld }"
   name = "${ var.name }"
+  env = "${ var.tags["env"] }"
 
   # modules
   vpc-id = "${ module.vpc.id }"
@@ -45,6 +47,7 @@ module "pki" {
   internal-tld = "${ var.internal-tld }"
   k8s = "${ var.k8s }"
   name = "${ var.name }"
+  tags = "${ var.tags }"
 
   # modules
   internal-zone-id = "${ module.route53.internal-zone-id }"
@@ -62,6 +65,7 @@ module "security" {
   cidr-allow-ssh = "${ var.cidr["allow-ssh"] }"
   cidr-vpc = "${ var.cidr["vpc"] }"
   name = "${ var.name }"
+  tags = "${ var.tags }"
 
   # modules
   vpc-id = "${ module.vpc.id }"
@@ -73,29 +77,30 @@ module "iam" {
 
   # variables
   name = "${ var.name }"
+  env = "${ var.tags["env"] }"
 
   # modules
   s3-bucket-arn = "${ module.s3.bucket-arn }"
 }
 
-module "bastion" {
-  source = "./modules/bastion"
-  depends-id = "${ module.vpc.depends-id }"
-
-  # variables
-  ami-id = "${ var.coreos-aws["ami"] }"
-  instance-type = "${ var.instance-type["bastion"] }"
-  internal-tld = "${ var.internal-tld }"
-  key-name = "${ var.aws["key-name"] }"
-  name = "${ var.name }"
-
-  # modules
-  s3-bucket = "${ module.s3.bucket }"
-  s3-bucket-arn = "${ module.s3.bucket-arn }"
-  security-group-id = "${ module.security.bastion-id }"
-  subnet-ids = "${ module.vpc.subnet-ids-public }"
-  vpc-id = "${ module.vpc.id }"
-}
+#module "bastion" {
+#  source = "./modules/bastion"
+#  depends-id = "${ module.vpc.depends-id }"
+#
+#  # variables
+#  ami-id = "${ var.coreos-aws["ami"] }"
+#  instance-type = "${ var.instance-type["bastion"] }"
+#  internal-tld = "${ var.internal-tld }"
+#  key-name = "${ var.aws["key-name"] }"
+#  name = "${ var.name }"
+#
+#  # modules
+#  s3-bucket = "${ module.s3.bucket }"
+#  s3-bucket-arn = "${ module.s3.bucket-arn }"
+#  security-group-id = "${ module.security.bastion-id }"
+#  subnet-ids = "${ module.vpc.subnet-ids-public }"
+#  vpc-id = "${ module.vpc.id }"
+#}
 
 module "etcd" {
   source = "./modules/etcd"
@@ -112,6 +117,7 @@ module "etcd" {
   ip-k8s-service = "${ var.k8s-service-ip }"
   k8s = "${ var.k8s }"
   name = "${ var.name }"
+  tags = "${ var.tags }"
   pod-ip-range = "${ var.cidr["pods"] }"
   service-cluster-ip-range = "${ var.cidr["service-cluster"] }"
 
@@ -133,9 +139,9 @@ module "worker" {
   ami-id = "${ var.coreos-aws["ami"] }"
   aws = "${ var.aws }"
   capacity = {
-    desired = 3
+    desired = 2
     max = 5
-    min = 3
+    min = 2
   }
   cluster-domain = "${ var.cluster-domain }"
   dns-service-ip = "${ var.dns-service-ip }"
@@ -143,6 +149,7 @@ module "worker" {
   internal-tld = "${ var.internal-tld }"
   k8s = "${ var.k8s }"
   name = "${ var.name }"
+  tags = "${ var.tags }"
   volume_size = {
     ebs = 250
     root = 52

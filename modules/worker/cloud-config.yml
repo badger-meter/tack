@@ -190,6 +190,7 @@ coreos:
           --cluster-dns=${ dns-service-ip } \
           --cluster-domain=${ cluster-domain } \
           --kubeconfig=/etc/kubernetes/kubeconfig.yml \
+          --node-labels=role=worker \
           --pod-manifest-path=/etc/kubernetes/manifests \
           --register-node=true \
           --tls-cert-file=/etc/kubernetes/ssl/k8s-worker.pem \

@@ -21,26 +21,31 @@ DIR_SSL				:= .cfssl
 
 # ∨∨∨∨∨∨∨∨∨∨∨∨∨∨∨∨∨∨∨∨∨∨∨∨∨∨∨∨∨∨∨∨∨∨∨∨∨∨∨∨∨∨∨
 
-AWS_REGION						?= us-west-2
+AWS_REGION						?= us-east-1
 COREOS_CHANNEL				?= stable
 COREOS_VM_TYPE				?= hvm
-CLUSTER_NAME 					?= test
+CLUSTER_NAME 					?= stage3
 
-AWS_EC2_KEY_NAME			?= kz8s-$(CLUSTER_NAME)
+AWS_EC2_KEY_NAME			?= k8s-$(CLUSTER_NAME)-kp
 AWS_EC2_KEY_PATH			:= ${DIR_KEY_PAIR}/${AWS_EC2_KEY_NAME}.pem
-INTERNAL_TLD 					:= ${CLUSTER_NAME}.kz8s
+INTERNAL_TLD 					:= ${CLUSTER_NAME}.k8s
+
+# BMI ADD
+ENV_TAG ?= stage
+PURPOSE_TAG ?= Stage
+METRICS_TAG ?= datadog
 
 HYPERKUBE_IMAGE				?= quay.io/coreos/hyperkube
 HYPERKUBE_TAG					?= v1.6.2_coreos.0
 
-CIDR_VPC							?= 10.0.0.0/16
+CIDR_VPC							?= 10.1.0.0/16
 CIDR_PODS							?= 10.2.0.0/16
 CIDR_SERVICE_CLUSTER	?= 10.3.0.0/24
 
 K8S_SERVICE_IP				?= 10.3.0.1
 K8S_DNS_IP						?= 10.3.0.10
 
-ETCD_IPS 							?= 10.0.10.10,10.0.10.11,10.0.10.12
+ETCD_IPS 							?= 10.1.0.50,10.1.0.51,10.1.0.52
 
 # Alternative:
 # CIDR_PODS ?= "172.15.0.0/16"
@@ -54,7 +59,7 @@ ETCD_IPS 							?= 10.0.10.10,10.0.10.11,10.0.10.12
 	./scripts/init-addons
 
 ## generate key-pair, variables and then `terraform apply`
-all: prereqs create-keypair init apply
+dont-run-all: prereqs create-keypair init apply
 	@echo "${GREEN}✓ terraform portion of 'make all' has completed ${NC}\n"
 	@$(MAKE) post-terraform
 
@@ -109,6 +114,15 @@ create-admin-certificate: ; @scripts/do-task "create admin certificate" \
 		${DIR_KEY_PAIR}/${AWS_EC2_KEY_NAME}.pem \
 		`terraform output bastion-ip`
 
+
+create-user-certificate: ; @scripts/do-task "create user certificate" \
+	scripts/create-user-certificate \
+		${DIR_SSL} \
+		`terraform output name` \
+		${DIR_KEY_PAIR}/${AWS_EC2_KEY_NAME}.pem \
+		`terraform output bastion-ip` \
+    ${USER}
+
 create-busybox: ; @scripts/do-task "create busybox test pod" \
 	kubectl create -f test/pods/busybox.yml
 
@@ -138,7 +152,7 @@ instances: ; @scripts/instances \
 journal: ; @scripts/ssh \
 	${DIR_KEY_PAIR}/${AWS_EC2_KEY_NAME}.pem \
 	`terraform output bastion-ip` \
-	"ssh `terraform output etcd1-ip` journalctl -fl"
+	"ssh core@`terraform output etcd1-ip` journalctl -fl"
 
 prereqs: ; @scripts/do-task "checking prerequisities" scripts/prereqs
 
@@ -147,19 +161,19 @@ ssh:
 	@scripts/ssh \
 		${DIR_KEY_PAIR}/${AWS_EC2_KEY_NAME}.pem \
 		`terraform output bastion-ip` \
-		"ssh `terraform output etcd1-ip`"
+		"ssh core@`terraform output etcd1-ip`"
 
 ## ssh into bastion host
-ssh-bastion:
+dont-run-ssh-bastion:
 	@scripts/ssh \
 		${DIR_KEY_PAIR}/${AWS_EC2_KEY_NAME}.pem \
 		`terraform output bastion-ip`
 
 ## status
-status: instances ; scripts/status
+dont-run-status: instances ; scripts/status
 
 ## smoke it
-test: test-ssl test-route53 test-etcd pods dns
+dont-run-test: test-ssl test-route53 test-etcd pods dns
 
 wait-for-cluster: ; @scripts/do-task "wait-for-cluster" scripts/wait-for-cluster
 

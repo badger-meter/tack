@@ -2,8 +2,8 @@
 
 function usage { cat <<EOF
 
-USAGE: $0 output-dir name key_file bastion_ip
-  example: $0 test-cfssl test .keypair/k8s-testing.pem 55.11.22.33
+USAGE: $0 output-dir name key_file bastion_ip user-name
+  example: $0 test-cfssl test .keypair/k8s-testing.pem 55.11.22.33 k8s-admin
 
 EOF
 
@@ -21,6 +21,10 @@ KEY_FILE=$3
 
 BASTION_IP=$4
 [ -z "${BASTION_IP}" ] && usage
+
+USER=$5
+[ -z "${USER}" ] && usage
+
 
 function error {
   echo "✗ Error on line $1"'!'
@@ -77,4 +81,4 @@ function generate {
 
 mkdir -p $OUTDIR && cd $OUTDIR
 
-generate k8s-admin client-server "${DEFAULT_HOSTS},*.*.compute.internal,*.ec2.internal"
+generate $USER client-server "${DEFAULT_HOSTS},*.*.compute.internal,*.ec2.internal"

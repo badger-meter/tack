@@ -15,6 +15,7 @@ variable "s3-bucket" {}
 variable "s3-bucket-arn" {}
 variable "subnet-ids" {}
 variable "vpc-id" {}
+variable "tags" { type="map" }
 
 output "depends-id" { value = "${ null_resource.dummy_dependency.id }" }
 output "ip" { value = "${ aws_instance.pki.private_ip }" }
